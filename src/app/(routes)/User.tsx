@@ -1,6 +1,6 @@
 'use client';
 
-import { PencilIcon, PlusIcon, TrashIcon } from 'lucide-react';
+import { CheckIcon, PencilIcon, PlusIcon, TrashIcon } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import useSWR, { mutate } from 'swr';
@@ -20,6 +20,8 @@ import {
   Input,
   DialogTrigger,
   Form,
+  DialogFooter,
+  DialogDescription,
 } from '@/components';
 
 interface User {
@@ -55,7 +57,12 @@ const fetcher = (url: string, { arg }: { arg: Request }) =>
 export default function UserComponent() {
   const [page, setPage] = useState(1);
   const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
+  const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
+  const [isActivingModalOpen, setIsActivingModalOpen] = useState(false);
   const [searchTerm, setSearchTerm] = useState('');
+  const [editingUser, setEditingUser] = useState<User | null>(null);
+  const [deletingUser, setDeletingUser] = useState<User | null>(null);
+  const [activingUser, setActivingUser] = useState<User | null>(null);
   const pageSize = 5;
   const form = useForm<Omit<User, 'id' | 'status'>>();
   const apiEndpoint = 'https://localhost:7120/api/v1/document-types/register';
@@ -72,6 +79,27 @@ export default function UserComponent() {
     // Fetch new data when page or search term changes
     mutate('https://localhost:7120/api/v1/document-types/pagination');
   }, [page, pageSize, searchTerm]);
+
+  useEffect(() => {
+    if (editingUser) {
+      form.reset({
+        name: editingUser.name,
+        code: editingUser.code,
+        description: editingUser.description,
+      });
+    } else {
+      form.reset({
+        name: '',
+        code: '',
+        description: '',
+      });
+    }
+  }, [editingUser, form, isModalOpen]);
+
+  const handleEdit = (user: User) => {
+    setEditingUser(user);
+    setIsModalOpen(true);
+  };
 
   const columns: Column<User>[] = [
     { key: 'name', header: 'Nombre' },
@@ -92,34 +120,101 @@ export default function UserComponent() {
     },
   ];
 
-  const handleEdit = (id: number) => {
-    console.log(`Edit item with id: ${id}`);
-  };
-
-  const handleDelete = (id: number) => {
-    console.log(`Delete item with id: ${id}`);
-  };
-
   const onSubmit = async (formData: Omit<User, 'id' | 'status'>) => {
     try {
-      const response = await fetch(apiEndpoint, {
-        method: 'POST',
+      const url = editingUser ? `https://localhost:7120/api/v1/document-types/update` : apiEndpoint;
+      const method = editingUser ? 'PUT' : 'POST';
+      const body = editingUser ? { ...formData, id: editingUser.id } : { ...formData };
+
+      const response = await fetch(url, {
+        method,
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify(formData),
+        body: JSON.stringify(body),
       });
 
       if (response.ok) {
         setIsModalOpen(false);
+        setEditingUser(null);
         form.reset();
-        // Revalidate the data
-        mutate('https://localhost:7120/api/v1/document-types/pagination');
+        await mutate('https://localhost:7120/api/v1/document-types/pagination');
       } else {
-        console.error('Failed to add new record');
+        console.error('Failed to save record');
       }
     } catch (error) {
-      console.error('Error adding new record:', error);
+      console.error('Error saving record:', error);
+    }
+  };
+
+  const handleModalOpenChange = (open: boolean) => {
+    setIsModalOpen(open);
+    if (!open) {
+      setEditingUser(null);
+    }
+  };
+
+  const handleDelete = (user: User) => {
+    setDeletingUser(user);
+    setIsDeleteModalOpen(true);
+  };
+
+  const handleActivate = (user: User) => {
+    setActivingUser(user);
+    setIsActivingModalOpen(true);
+  };
+
+  const confirmDelete = async () => {
+    if (deletingUser) {
+      try {
+        const response = await fetch(`https://localhost:7120/api/v1/document-types/delete/${deletingUser.id}`, {
+          method: 'DELETE',
+        });
+
+        if (response.ok) {
+          setIsDeleteModalOpen(false);
+          setDeletingUser(null);
+          await mutate('https://localhost:7120/api/v1/document-types/pagination');
+        } else {
+          console.error('Failed to delete record');
+        }
+      } catch (error) {
+        console.error('Error deleting record:', error);
+      }
+    }
+  };
+
+  const confirmActivate = async () => {
+    if (activingUser) {
+      try {
+        const response = await fetch(`https://localhost:7120/api/v1/document-types/restore/${activingUser.id}`, {
+          method: 'PATCH',
+        });
+
+        if (response.ok) {
+          setIsActivingModalOpen(false);
+          setActivingUser(null);
+          await mutate('https://localhost:7120/api/v1/document-types/pagination');
+        } else {
+          console.error('Failed to delete record');
+        }
+      } catch (error) {
+        console.error('Error deleting record:', error);
+      }
+    }
+  };
+
+  const handleDeleteModalOpenChange = (open: boolean) => {
+    setIsDeleteModalOpen(open);
+    if (!open) {
+      setDeletingUser(null);
+    }
+  };
+
+  const handleActivateModalOpenChange = (open: boolean) => {
+    setIsActivingModalOpen(open);
+    if (!open) {
+      setDeletingUser(null);
     }
   };
 
@@ -128,7 +223,7 @@ export default function UserComponent() {
   return (
     <div>
       <div className="mb-4 flex items-center justify-between">
-        <Dialog open={isModalOpen} onOpenChange={setIsModalOpen}>
+        <Dialog open={isModalOpen} onOpenChange={handleModalOpenChange}>
           <DialogTrigger asChild>
             <Button variant="default">
               <PlusIcon className="mr-2 h-4 w-4" />
@@ -137,7 +232,7 @@ export default function UserComponent() {
           </DialogTrigger>
           <DialogContent>
             <DialogHeader>
-              <DialogTitle>Agregar nuevo registro</DialogTitle>
+              <DialogTitle>{editingUser ? 'Editar registro' : 'Agregar nuevo registro'}</DialogTitle>
             </DialogHeader>
             <Form {...form}>
               <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
@@ -194,17 +289,56 @@ export default function UserComponent() {
         isLoading={isLoading}
         actions={(item) => (
           <>
-            <Button variant="outline" size="sm" onClick={() => handleEdit(item.id)} className="mr-2">
+            <Button variant="outline" size="sm" onClick={() => handleEdit(item)} className="mr-2">
               <PencilIcon className="mr-1 h-4 w-4" />
               Editar
             </Button>
-            <Button variant="outline" size="sm" onClick={() => handleDelete(item.id)}>
-              <TrashIcon className="mr-1 h-4 w-4" />
-              Eliminar
-            </Button>
+            {item.status ? (
+              <Button variant="outline" size="sm" onClick={() => handleDelete(item)}>
+                <TrashIcon className="mr-1 h-4 w-4" />
+                Eliminar
+              </Button>
+            ) : (
+              <Button variant="outline" size="sm" onClick={() => handleActivate(item)}>
+                <CheckIcon className="mr-1 h-4 w-4" />
+                Activar
+              </Button>
+            )}
           </>
         )}
       />
+      <Dialog open={isDeleteModalOpen} onOpenChange={handleDeleteModalOpenChange}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Confirmar eliminación</DialogTitle>
+            <DialogDescription>¿Esta seguro de eliminar el tipo de documento: {deletingUser?.name}?</DialogDescription>
+          </DialogHeader>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setIsDeleteModalOpen(false)}>
+              Cancelar
+            </Button>
+            <Button variant="destructive" onClick={confirmDelete}>
+              Eliminar
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+      <Dialog open={isActivingModalOpen} onOpenChange={handleActivateModalOpenChange}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Confirmar restauración</DialogTitle>
+            <DialogDescription>¿Esta seguro de restaurar el tipo de documento: {deletingUser?.name}?</DialogDescription>
+          </DialogHeader>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setIsActivingModalOpen(false)}>
+              Cancelar
+            </Button>
+            <Button variant="default" onClick={confirmActivate}>
+              Activar
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }
