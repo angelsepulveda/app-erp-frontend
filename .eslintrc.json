@@ -13,6 +13,7 @@
   },
   "ignorePatterns": ["/*.config.*"],
   "rules": {
+    "@typescript-eslint/no-explicit-any": "off",
     // Reglas personalizadas
     "import-helpers/order-imports": [
       "warn",
