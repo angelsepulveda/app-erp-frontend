@@ -1,1 +1,1 @@
-export * from './PrivateLayout'
+export * from './PrivateLayout';
