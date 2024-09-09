@@ -1,6 +1,6 @@
 import { EndPointDocumentTypeDatagrid } from '@/app/(routes)/(settings)/document-types/components/utils';
 import { DocumentType } from '@/models/settings/documentType';
-import { deleteDocumentTypeService } from '@/services/settings/useService';
+import { deleteDocumentTypeService } from '@/services/settings/documentTypeService';
 import { Dispatch, SetStateAction } from 'react';
 import { ScopedMutator } from 'swr/_internal';
 

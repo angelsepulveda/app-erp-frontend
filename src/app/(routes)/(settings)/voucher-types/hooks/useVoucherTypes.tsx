@@ -1,6 +1,6 @@
-import { EndPointDocumentTypeDatagrid } from '@/app/(routes)/(settings)/document-types/components/utils';
-import { DocumentType, DocumentTypeResponse } from '@/models/settings/documentType';
-import { fetchDocumentTypes } from '@/services/settings/documentTypeService';
+import { EndPointVoucherTypeDatagrid } from '@/app/(routes)/(settings)/voucher-types/utils';
+import { VoucherType, VoucherTypeResponse } from '@/models';
+import { fetchDocumentTypes, fetchVoucherTypesService } from '@/services';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useEffect, useState } from 'react';
 import { useForm } from 'react-hook-form';
@@ -9,18 +9,18 @@ import * as z from 'zod';
 
 import { Column } from '@/components';
 
-export const useDocumentType = () => {
+export const UseVoucherTypes = () => {
   const [page, setPage] = useState<number>(1);
   const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
   const [isRestoreModalOpen, setIsRestoreModalOpen] = useState(false);
   const [searchTerm, setSearchTerm] = useState('');
-  const [editingDocumentType, setEditingDocumentType] = useState<DocumentType | null>(null);
-  const [deletingDocumentType, setDeletingDocumentType] = useState<DocumentType | null>(null);
-  const [restoreDocumentType, setRestoreDocumentType] = useState<DocumentType | null>(null);
+  const [editing, setEditing] = useState<VoucherType | null>(null);
+  const [deleting, setDeleting] = useState<VoucherType | null>(null);
+  const [restore, setRestore] = useState<VoucherType | null>(null);
   const pageSize = 5;
 
-  const documentTypeSchema = z.object({
+  const voucherTypeSchema = z.object({
     name: z
       .string()
       .min(2, 'Nombre debe tener al menos 2 caracteres')
@@ -29,10 +29,10 @@ export const useDocumentType = () => {
     code: z.string().max(10, 'El codigo no debe superar los 10 caracteres'),
   });
 
-  type DocumentTypeFormData = z.infer<typeof documentTypeSchema>;
+  type VoucherTypeFormData = z.infer<typeof voucherTypeSchema>;
 
-  const form = useForm<DocumentTypeFormData>({
-    resolver: zodResolver(documentTypeSchema),
+  const form = useForm<VoucherTypeFormData>({
+    resolver: zodResolver(voucherTypeSchema),
     defaultValues: {
       name: '',
       description: '',
@@ -40,34 +40,34 @@ export const useDocumentType = () => {
     },
   });
 
-  const { data, error, isLoading } = useSWR<DocumentTypeResponse>(EndPointDocumentTypeDatagrid, () =>
-    fetchDocumentTypes(page, pageSize, searchTerm),
+  const { data, error, isLoading } = useSWR<VoucherTypeResponse>(EndPointVoucherTypeDatagrid, () =>
+    fetchVoucherTypesService(page, pageSize, searchTerm),
   );
 
   useEffect(() => {
     // Fetch new data when page or search term changes
-    mutate(EndPointDocumentTypeDatagrid);
+    mutate(EndPointVoucherTypeDatagrid);
   }, [page, pageSize, searchTerm]);
 
-  const handleEdit = (documentType: DocumentType) => {
-    setEditingDocumentType(documentType);
+  const handleEdit = (voucherType: VoucherType) => {
+    setEditing(voucherType);
     setIsModalOpen(true);
   };
 
-  const columns: Column<DocumentType>[] = [
+  const columns: Column<VoucherType>[] = [
     { key: 'name', header: 'Nombre' },
     { key: 'code', header: 'Codigo' },
     { key: 'description', header: 'Descripcion' },
     {
       key: 'status',
       header: 'Estado',
-      render: (documentType) => (
+      render: (voucherType) => (
         <span
           className={`rounded-full px-2 py-1 text-xs font-semibold ${
-            documentType.status ? 'bg-green-600 text-white' : 'bg-red-600 text-white'
+            voucherType.status ? 'bg-green-600 text-white' : 'bg-red-600 text-white'
           }`}
         >
-          {documentType.status ? 'Activo' : 'Desactivado'}
+          {voucherType.status ? 'Activo' : 'Desactivado'}
         </span>
       ),
     },
@@ -76,17 +76,17 @@ export const useDocumentType = () => {
   const handleModalOpenChange = (open: boolean) => {
     setIsModalOpen(open);
     if (!open) {
-      setEditingDocumentType(null);
+      setEditing(null);
     }
   };
 
-  const handleDelete = (user: DocumentType) => {
-    setDeletingDocumentType(user);
+  const handleDelete = (voucherType: VoucherType) => {
+    setDeleting(voucherType);
     setIsDeleteModalOpen(true);
   };
 
-  const handleActivate = (user: DocumentType) => {
-    setRestoreDocumentType(user);
+  const handleActivate = (voucherType: VoucherType) => {
+    setRestore(voucherType);
     setIsRestoreModalOpen(true);
   };
 
@@ -101,20 +101,20 @@ export const useDocumentType = () => {
     isModalOpen,
     isDeleteModalOpen,
     isRestoreModalOpen,
-    editingDocumentType,
-    restoreDocumentType,
-    deletingDocumentType,
+    editing,
+    restore,
+    deleting,
     page,
     form,
     setPage,
     setSearchTerm,
     columns,
     pageSize,
-    setEditingDocumentType,
+    setEditing,
     setIsModalOpen,
     setIsDeleteModalOpen,
     setIsRestoreModalOpen,
-    setRestoreDocumentType,
-    setDeletingDocumentType,
+    setRestore,
+    setDeleting,
   };
 };

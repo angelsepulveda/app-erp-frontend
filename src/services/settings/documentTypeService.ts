@@ -17,7 +17,20 @@ export const fetchDocumentTypes = async (
   pageSize: number,
   searchTerm: string,
 ): Promise<DocumentTypeResponse> => {
-  return apiService.post<DocumentTypeResponse>(`${API_ENDPOINT}/pagination`, { pageIndex: page, pageSize });
+  const response = await apiService.post<DocumentTypeResponse>(`${API_ENDPOINT}/pagination`, {
+    pageIndex: page,
+    pageSize,
+  });
+
+  if (response) return response;
+
+  return {
+    data: [],
+    totalPages: 1,
+    pageIndex: 1,
+    hasPreviousPage: false,
+    hasNextPage: false,
+  };
 };
 
 export const registerDocumentTypeService = async (data: DocumentTypeFormData): Promise<void> => {

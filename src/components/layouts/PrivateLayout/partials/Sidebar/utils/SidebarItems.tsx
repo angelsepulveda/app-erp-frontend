@@ -7,6 +7,9 @@ export const sidebarItems: SidebarItemProps[] = [
   {
     title: 'Configuración',
     icon: <Settings size={20} />,
-    submenu: [{ title: 'Tipos de documentos', icon: <Settings size={20} />, href: '/document-types' }],
+    submenu: [
+      { title: 'Tipos de documentos', icon: <Settings size={20} />, href: '/document-types' },
+      { title: 'Tipos de comprobantes', icon: <Settings size={20} />, href: '/voucher-types' },
+    ],
   },
 ];

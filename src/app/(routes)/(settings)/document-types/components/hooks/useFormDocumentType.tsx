@@ -1,6 +1,6 @@
 import { EndPointDocumentTypeDatagrid } from '@/app/(routes)/(settings)/document-types/components/utils';
 import { DocumentType } from '@/models/settings/documentType';
-import { registerDocumentTypeService, updateDocumentTypeService } from '@/services/settings/useService';
+import { registerDocumentTypeService, updateDocumentTypeService } from '@/services/settings/documentTypeService';
 import { Dispatch, SetStateAction, useEffect } from 'react';
 import { UseFormReturn } from 'react-hook-form';
 import { ScopedMutator } from 'swr/_internal';

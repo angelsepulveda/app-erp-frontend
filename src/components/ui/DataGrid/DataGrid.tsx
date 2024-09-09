@@ -98,7 +98,7 @@ export function DataGrid<T extends { id: number | string }>({
               {columns.map((column) => (
                 <TableHead key={String(column.key)}>{column.header}</TableHead>
               ))}
-              {actions && <TableHead>Actions</TableHead>}
+              {actions && <TableHead>Acciones</TableHead>}
             </TableRow>
           </TableHeader>
           <TableBody>

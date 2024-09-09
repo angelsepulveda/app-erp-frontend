@@ -1,36 +1,36 @@
-import { EndPointDocumentTypeDatagrid } from '@/app/(routes)/(settings)/document-types/components/utils';
-import { DocumentType } from '@/models/settings/documentType';
-import { restoreDocumentTypeService } from '@/services/settings/documentTypeService';
+import { EndPointVoucherTypeDatagrid } from '@/app/(routes)/(settings)/voucher-types/utils';
+import { DocumentType } from '@/models';
+import { restoreVoucherTypeService } from '@/services';
 import { Dispatch, SetStateAction } from 'react';
 import { ScopedMutator } from 'swr/_internal';
 
 import { toast } from '@/components/hooks/use-toast';
 
-type TUseRestoreDocumentTypeProps = {
-  restoreDocumentType: DocumentType | null;
-  setRestoreDocumentType: Dispatch<SetStateAction<DocumentType | null>>;
+type TUseRestoreVoucherTypeProps = {
+  restore: DocumentType | null;
+  setRestore: Dispatch<SetStateAction<DocumentType | null>>;
   mutate: ScopedMutator;
   setIsRestoreModalOpen: Dispatch<SetStateAction<boolean>>;
 };
 
-export const useRestoreDocumentType = ({
-  setRestoreDocumentType,
+export const UseRestoreVoucherType = ({
+  setRestore,
+  restore,
   setIsRestoreModalOpen,
-  restoreDocumentType,
   mutate,
-}: TUseRestoreDocumentTypeProps) => {
+}: TUseRestoreVoucherTypeProps) => {
   const confirmRestore = async () => {
-    if (restoreDocumentType) {
+    if (restore) {
       try {
-        await restoreDocumentTypeService(restoreDocumentType.id);
+        await restoreVoucherTypeService(restore.id);
         toast({
           title: 'El tipo de documento restaurado',
-          description: `${restoreDocumentType?.name} se ha realizado correctamente la restauración.`,
+          description: `${restore?.name} se ha realizado correctamente la restauración.`,
           variant: 'default',
         });
         setIsRestoreModalOpen(false);
-        setRestoreDocumentType(null);
-        await mutate(EndPointDocumentTypeDatagrid);
+        setRestore(null);
+        await mutate(EndPointVoucherTypeDatagrid);
       } catch (error) {
         toast({
           title: 'Error',
@@ -44,7 +44,7 @@ export const useRestoreDocumentType = ({
   const handleRestoreModalOpenChange = (open: boolean) => {
     setIsRestoreModalOpen(open);
     if (!open) {
-      setRestoreDocumentType(null);
+      setRestore(null);
     }
   };
 
