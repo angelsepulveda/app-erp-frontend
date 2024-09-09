@@ -44,6 +44,10 @@ export const UseVoucherTypes = () => {
     fetchVoucherTypesService(page, pageSize, searchTerm),
   );
 
+  const handleSearch = (value: string): void => {
+    setSearchTerm(value);
+  };
+
   useEffect(() => {
     // Fetch new data when page or search term changes
     mutate(EndPointVoucherTypeDatagrid);
@@ -116,5 +120,6 @@ export const UseVoucherTypes = () => {
     setIsRestoreModalOpen,
     setRestore,
     setDeleting,
+    handleSearch,
   };
 };

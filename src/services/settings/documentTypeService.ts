@@ -20,6 +20,7 @@ export const fetchDocumentTypes = async (
   const response = await apiService.post<DocumentTypeResponse>(`${API_ENDPOINT}/pagination`, {
     pageIndex: page,
     pageSize,
+    search: searchTerm,
   });
 
   if (response) return response;

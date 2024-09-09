@@ -40,12 +40,14 @@ export const useDocumentType = () => {
     },
   });
 
+  const handleSearch = (value: string): void => {
+    setSearchTerm(value);
+  };
+
   const { data, error, isLoading } = useSWR<DocumentTypeResponse>(EndPointDocumentTypeDatagrid, () =>
     fetchDocumentTypes(page, pageSize, searchTerm),
   );
-
   useEffect(() => {
-    // Fetch new data when page or search term changes
     mutate(EndPointDocumentTypeDatagrid);
   }, [page, pageSize, searchTerm]);
 
@@ -116,5 +118,6 @@ export const useDocumentType = () => {
     setIsRestoreModalOpen,
     setRestoreDocumentType,
     setDeletingDocumentType,
+    handleSearch,
   };
 };

@@ -11,3 +11,4 @@ export * from './form';
 export * from './DataGrid';
 export * from './toaster';
 export * from './toast';
+export * from './skeleton';

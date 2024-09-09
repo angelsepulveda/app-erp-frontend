@@ -16,6 +16,8 @@ import {
   TableRow,
   Button,
   Input,
+  SkeletonDataGrid,
+  SkeletonDataGridMobile,
 } from '@/components';
 
 export interface Column<T> {
@@ -82,7 +84,17 @@ export function DataGrid<T extends { id: number | string }>({
     return buttons;
   };
 
-  if (isLoading) return <div>Loading...</div>;
+  if (isLoading)
+    return (
+      <>
+        <div className="hidden xl:block">
+          <SkeletonDataGrid columns={columns.length} rows={5} />
+        </div>
+        <div className="block xl:hidden">
+          <SkeletonDataGridMobile count={columns.length} />
+        </div>
+      </>
+    );
 
   return (
     <div className="container mx-auto p-4">

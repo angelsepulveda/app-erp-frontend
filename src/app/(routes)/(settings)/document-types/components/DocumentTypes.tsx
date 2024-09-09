@@ -27,7 +27,6 @@ export const DocumentTypes = () => {
     page,
     form,
     data,
-    setSearchTerm,
     columns,
     pageSize,
     setEditingDocumentType,
@@ -36,6 +35,7 @@ export const DocumentTypes = () => {
     setIsRestoreModalOpen,
     setDeletingDocumentType,
     setRestoreDocumentType,
+    handleSearch,
   } = useDocumentType();
 
   if (error) return <div>Failed to load data</div>;
@@ -60,7 +60,7 @@ export const DocumentTypes = () => {
         page={page}
         pageSize={pageSize}
         onPageChange={setPage}
-        onSearch={setSearchTerm}
+        onSearch={handleSearch}
         isLoading={isLoading}
         actions={(item) => (
           <>

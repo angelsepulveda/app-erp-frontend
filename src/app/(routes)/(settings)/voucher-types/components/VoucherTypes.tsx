@@ -30,7 +30,6 @@ export const VouchersTypes = () => {
     page,
     form,
     data,
-    setSearchTerm,
     columns,
     pageSize,
     setEditing,
@@ -39,6 +38,7 @@ export const VouchersTypes = () => {
     setIsRestoreModalOpen,
     setDeleting,
     setRestore,
+    handleSearch,
   } = UseVoucherTypes();
 
   if (error) return <div>Failed to load data</div>;
@@ -63,7 +63,7 @@ export const VouchersTypes = () => {
         page={page}
         pageSize={pageSize}
         onPageChange={setPage}
-        onSearch={setSearchTerm}
+        onSearch={handleSearch}
         isLoading={isLoading}
         actions={(item) => (
           <>

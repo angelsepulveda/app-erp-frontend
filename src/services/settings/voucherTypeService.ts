@@ -20,6 +20,7 @@ export const fetchVoucherTypesService = async (
   const response = await apiService.post<VoucherTypeResponse>(`${API_ENDPOINT}/pagination`, {
     pageIndex: page,
     pageSize,
+    search: searchTerm,
   });
 
   if (response) return response;
