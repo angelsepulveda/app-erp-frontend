@@ -1,4 +1,6 @@
+import { EndPointDocumentTypeDatagrid } from '@/app/(routes)/(settings)/document-types/components/utils';
 import { DocumentType } from '@/models/settings/documentType';
+import { deleteDocumentTypeService } from '@/services/settings/useService';
 import { Dispatch, SetStateAction } from 'react';
 import { ScopedMutator } from 'swr/_internal';
 
@@ -20,26 +22,17 @@ export const useDeleteDocumentType = ({
   const confirmDelete = async () => {
     if (deletingDocumentType) {
       try {
-        const response = await fetch(`https://localhost:7120/api/v1/document-types/delete/${deletingDocumentType.id}`, {
-          method: 'DELETE',
+        await deleteDocumentTypeService(deletingDocumentType.id);
+        toast({
+          title: 'El tipo de documento eliminado',
+          description: `${deletingDocumentType?.name} se ha realizado correctamente la eliminación.`,
+          variant: 'default',
         });
-        if (response.ok) {
-          toast({
-            title: 'El tipo de documento eliminado',
-            description: `${deletingDocumentType?.name} se ha realizado correctamente la eliminación.`,
-            variant: 'default',
-          });
-          setIsDeleteModalOpen(false);
-          setDeletingDocumentType(null);
-          await mutate('https://localhost:7120/api/v1/document-types/pagination');
-        } else {
-          toast({
-            title: 'Error',
-            description: `Error al eliminar el tipo de documento. Intentelo nuevamente.`,
-            variant: 'destructive',
-          });
-        }
+        setIsDeleteModalOpen(false);
+        setDeletingDocumentType(null);
+        await mutate(EndPointDocumentTypeDatagrid);
       } catch (error) {
+        console.log(error);
         toast({
           title: 'Error',
           description: `Error al eliminar el tipo de documento. Intentelo nuevamente.`,

@@ -1,4 +1,6 @@
+import { EndPointDocumentTypeDatagrid } from '@/app/(routes)/(settings)/document-types/components/utils';
 import { DocumentType } from '@/models/settings/documentType';
+import { restoreDocumentTypeService } from '@/services/settings/useService';
 import { Dispatch, SetStateAction } from 'react';
 import { ScopedMutator } from 'swr/_internal';
 
@@ -20,26 +22,15 @@ export const useRestoreDocumentType = ({
   const confirmRestore = async () => {
     if (restoreDocumentType) {
       try {
-        const response = await fetch(`https://localhost:7120/api/v1/document-types/restore/${restoreDocumentType.id}`, {
-          method: 'PATCH',
+        await restoreDocumentTypeService(restoreDocumentType.id);
+        toast({
+          title: 'El tipo de documento restaurado',
+          description: `${restoreDocumentType?.name} se ha realizado correctamente la restauración.`,
+          variant: 'default',
         });
-
-        if (response.ok) {
-          toast({
-            title: 'El tipo de documento restaurado',
-            description: `${restoreDocumentType?.name} se ha realizado correctamente la restauración.`,
-            variant: 'default',
-          });
-          setIsRestoreModalOpen(false);
-          setRestoreDocumentType(null);
-          await mutate('https://localhost:7120/api/v1/document-types/pagination');
-        } else {
-          toast({
-            title: 'Error',
-            description: `Error al restaurar el tipo de documento. Intentelo nuevamente.`,
-            variant: 'destructive',
-          });
-        }
+        setIsRestoreModalOpen(false);
+        setRestoreDocumentType(null);
+        await mutate(EndPointDocumentTypeDatagrid);
       } catch (error) {
         toast({
           title: 'Error',

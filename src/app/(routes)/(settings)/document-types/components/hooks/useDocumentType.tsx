@@ -1,4 +1,6 @@
-import { DocumentType } from '@/models/settings/documentType';
+import { EndPointDocumentTypeDatagrid } from '@/app/(routes)/(settings)/document-types/components/utils';
+import { DocumentType, DocumentTypeResponse } from '@/models/settings/documentType';
+import { fetchDocumentTypes } from '@/services/settings/useService';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useEffect, useState } from 'react';
 import { useForm } from 'react-hook-form';
@@ -6,28 +8,6 @@ import useSWR, { mutate } from 'swr';
 import * as z from 'zod';
 
 import { Column } from '@/components';
-
-interface ApiResponse {
-  data: DocumentType[];
-  totalPages: number;
-  pageIndex: number;
-  hasPreviousPage: boolean;
-  hasNextPage: boolean;
-}
-
-interface Request {
-  pageIndex: number;
-  pageSize: number;
-}
-
-const fetcher = (url: string, { arg }: { arg: Request }) =>
-  fetch(url, {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-    },
-    body: JSON.stringify(arg),
-  }).then((res) => res.json());
 
 export const useDocumentType = () => {
   const [page, setPage] = useState<number>(1);
@@ -60,17 +40,13 @@ export const useDocumentType = () => {
     },
   });
 
-  const { data, error, isLoading } = useSWR<ApiResponse>(
-    'https://localhost:7120/api/v1/document-types/pagination',
-    (url: string) =>
-      fetcher(url, {
-        arg: { pageIndex: page, pageSize },
-      }),
+  const { data, error, isLoading } = useSWR<DocumentTypeResponse>(EndPointDocumentTypeDatagrid, () =>
+    fetchDocumentTypes(page, pageSize, searchTerm),
   );
 
   useEffect(() => {
     // Fetch new data when page or search term changes
-    mutate('https://localhost:7120/api/v1/document-types/pagination');
+    mutate(EndPointDocumentTypeDatagrid);
   }, [page, pageSize, searchTerm]);
 
   const handleEdit = (documentType: DocumentType) => {
