@@ -1,102 +1,42 @@
 'use client';
 
+import { useDocumentType } from '@/app/(routes)/(settings)/document-types/components/hooks';
 import { DocumentType } from '@/models/settings/documentType';
 import { CheckIcon, PencilIcon, TrashIcon } from 'lucide-react';
-import { useEffect, useState } from 'react';
-import { useForm } from 'react-hook-form';
-import useSWR, { mutate } from 'swr';
+import { mutate } from 'swr';
 
-import { Button, Column, DataGrid } from '@/components';
+import { Button, DataGrid } from '@/components';
 
 import { DeleteDocumentType, FormDocumentType, RestoreDocumentType } from './partials';
 
-interface ApiResponse {
-  data: DocumentType[];
-  totalPages: number;
-  pageIndex: number;
-  hasPreviousPage: boolean;
-  hasNextPage: boolean;
-}
-
-interface Request {
-  pageIndex: number;
-  pageSize: number;
-}
-
-const fetcher = (url: string, { arg }: { arg: Request }) =>
-  fetch(url, {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-    },
-    body: JSON.stringify(arg),
-  }).then((res) => res.json());
-
 export const DocumentTypes = () => {
-  const [page, setPage] = useState(1);
-  const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
-  const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
-  const [isRestoreModalOpen, setIsRestoreModalOpen] = useState(false);
-  const [searchTerm, setSearchTerm] = useState('');
-  const [editingDocumentType, setEditingDocumentType] = useState<DocumentType | null>(null);
-  const [deletingDocumentType, setDeletingDocumentType] = useState<DocumentType | null>(null);
-  const [restoreDocumentType, setRestoreDocumentType] = useState<DocumentType | null>(null);
-  const pageSize = 5;
-  const form = useForm<Omit<DocumentType, 'id' | 'status'>>();
-
-  const { data, error, isLoading } = useSWR<ApiResponse>(
-    'https://localhost:7120/api/v1/document-types/pagination',
-    (url: string) =>
-      fetcher(url, {
-        arg: { pageIndex: page, pageSize },
-      }),
-  );
-
-  useEffect(() => {
-    // Fetch new data when page or search term changes
-    mutate('https://localhost:7120/api/v1/document-types/pagination');
-  }, [page, pageSize, searchTerm]);
-
-  const handleEdit = (documentType: DocumentType) => {
-    setEditingDocumentType(documentType);
-    setIsModalOpen(true);
-  };
-
-  const columns: Column<DocumentType>[] = [
-    { key: 'name', header: 'Nombre' },
-    { key: 'code', header: 'Codigo' },
-    { key: 'description', header: 'Descripcion' },
-    {
-      key: 'status',
-      header: 'Estado',
-      render: (documentType) => (
-        <span
-          className={`rounded-full px-2 py-1 text-xs font-semibold ${
-            documentType.status ? 'bg-green-600 text-white' : 'bg-red-600 text-white'
-          }`}
-        >
-          {documentType.status ? 'Activo' : 'Desactivado'}
-        </span>
-      ),
-    },
-  ];
-
-  const handleModalOpenChange = (open: boolean) => {
-    setIsModalOpen(open);
-    if (!open) {
-      setEditingDocumentType(null);
-    }
-  };
-
-  const handleDelete = (user: DocumentType) => {
-    setDeletingDocumentType(user);
-    setIsDeleteModalOpen(true);
-  };
-
-  const handleActivate = (user: DocumentType) => {
-    setRestoreDocumentType(user);
-    setIsRestoreModalOpen(true);
-  };
+  const {
+    error,
+    restoreDocumentType,
+    editingDocumentType,
+    deletingDocumentType,
+    handleDelete,
+    handleActivate,
+    isDeleteModalOpen,
+    isRestoreModalOpen,
+    isModalOpen,
+    isLoading,
+    handleEdit,
+    handleModalOpenChange,
+    setPage,
+    page,
+    form,
+    data,
+    setSearchTerm,
+    columns,
+    pageSize,
+    setEditingDocumentType,
+    setIsModalOpen,
+    setIsDeleteModalOpen,
+    setIsRestoreModalOpen,
+    setDeletingDocumentType,
+    setRestoreDocumentType,
+  } = useDocumentType();
 
   if (error) return <div>Failed to load data</div>;
 

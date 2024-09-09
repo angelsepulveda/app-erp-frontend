@@ -1,5 +1,6 @@
 'use client';
 
+import { useRestoreDocumentType } from '@/app/(routes)/(settings)/document-types/components/hooks';
 import { DocumentType } from '@/models/settings/documentType';
 import { Dispatch, SetStateAction } from 'react';
 import { ScopedMutator } from 'swr/_internal';
@@ -29,32 +30,14 @@ export const RestoreDocumentType = ({
   isRestoreModalOpen,
   mutate,
 }: TRestoreDocumentTypeProps) => {
-  const confirmRestore = async () => {
-    if (restoreDocumentType) {
-      try {
-        const response = await fetch(`https://localhost:7120/api/v1/document-types/restore/${restoreDocumentType.id}`, {
-          method: 'PATCH',
-        });
-
-        if (response.ok) {
-          setIsRestoreModalOpen(false);
-          setRestoreDocumentType(null);
-          await mutate('https://localhost:7120/api/v1/document-types/pagination');
-        } else {
-          console.error('Failed to delete record');
-        }
-      } catch (error) {
-        console.error('Error deleting record:', error);
-      }
-    }
+  const useRestore = {
+    setRestoreDocumentType,
+    restoreDocumentType,
+    setIsRestoreModalOpen,
+    mutate,
   };
 
-  const handleRestoreModalOpenChange = (open: boolean) => {
-    setIsRestoreModalOpen(open);
-    if (!open) {
-      setRestoreDocumentType(null);
-    }
-  };
+  const { handleRestoreModalOpenChange, confirmRestore } = useRestoreDocumentType(useRestore);
 
   return (
     <Dialog open={isRestoreModalOpen} onOpenChange={handleRestoreModalOpenChange}>

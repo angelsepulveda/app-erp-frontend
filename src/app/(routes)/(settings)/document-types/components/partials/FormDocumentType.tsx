@@ -1,8 +1,9 @@
 'use client';
 
+import { useFormDocumentType } from '@/app/(routes)/(settings)/document-types/components/hooks';
 import { DocumentType } from '@/models/settings/documentType';
 import { PlusIcon } from 'lucide-react';
-import { Dispatch, SetStateAction, useEffect } from 'react';
+import { Dispatch, SetStateAction } from 'react';
 import { UseFormReturn } from 'react-hook-form';
 import { ScopedMutator } from 'swr/_internal';
 
@@ -18,6 +19,7 @@ import {
   FormField,
   FormItem,
   FormLabel,
+  FormMessage,
   Input,
 } from '@/components';
 
@@ -40,50 +42,16 @@ export const FormDocumentType = ({
   setIsModalOpen,
   setEditingDocumentType,
 }: TFormDocumentTypeProps) => {
-  const onSubmit = async (formData: Omit<DocumentType, 'id' | 'status'>) => {
-    try {
-      const url = editingDocumentType
-        ? `https://localhost:7120/api/v1/document-types/update`
-        : 'https://localhost:7120/api/v1/document-types/register';
-      const method = editingDocumentType ? 'PUT' : 'POST';
-      const body = editingDocumentType ? { ...formData, id: editingDocumentType.id } : { ...formData };
-
-      const response = await fetch(url, {
-        method,
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(body),
-      });
-
-      if (response.ok) {
-        setIsModalOpen(false);
-        setEditingDocumentType(null);
-        form.reset();
-        await mutate('https://localhost:7120/api/v1/document-types/pagination');
-      } else {
-        console.error('Failed to save record');
-      }
-    } catch (error) {
-      console.error('Error saving record:', error);
-    }
+  const dataUse = {
+    editingDocumentType,
+    isModalOpen,
+    form,
+    mutate,
+    setIsModalOpen,
+    setEditingDocumentType,
   };
 
-  useEffect(() => {
-    if (editingDocumentType) {
-      form.reset({
-        name: editingDocumentType.name,
-        code: editingDocumentType.code,
-        description: editingDocumentType.description,
-      });
-    } else {
-      form.reset({
-        name: '',
-        code: '',
-        description: '',
-      });
-    }
-  }, [editingDocumentType, form, isModalOpen]);
+  const { onSubmit } = useFormDocumentType(dataUse);
 
   return (
     <Dialog open={isModalOpen} onOpenChange={handleModalOpenChange}>
@@ -108,6 +76,7 @@ export const FormDocumentType = ({
                   <FormControl>
                     <Input {...field} />
                   </FormControl>
+                  <FormMessage />
                 </FormItem>
               )}
             />
@@ -120,6 +89,7 @@ export const FormDocumentType = ({
                   <FormControl>
                     <Input {...field} />
                   </FormControl>
+                  <FormMessage />
                 </FormItem>
               )}
             />
@@ -132,6 +102,7 @@ export const FormDocumentType = ({
                   <FormControl>
                     <Input {...field} />
                   </FormControl>
+                  <FormMessage />
                 </FormItem>
               )}
             />

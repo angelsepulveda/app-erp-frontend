@@ -1,7 +1,8 @@
 'use client';
 
+import { useDeleteDocumentType } from '@/app/(routes)/(settings)/document-types/components/hooks';
 import { DocumentType } from '@/models/settings/documentType';
-import { Dispatch, SetStateAction, useState } from 'react';
+import { Dispatch, SetStateAction } from 'react';
 import { ScopedMutator } from 'swr/_internal';
 
 import {
@@ -29,31 +30,14 @@ export const DeleteDocumentType = ({
   setIsDeleteModalOpen,
   isDeleteModalOpen,
 }: TDeleteDocumentTypeProps) => {
-  const confirmDelete = async () => {
-    if (deletingDocumentType) {
-      try {
-        const response = await fetch(`https://localhost:7120/api/v1/document-types/delete/${deletingDocumentType.id}`, {
-          method: 'DELETE',
-        });
-        if (response.ok) {
-          setIsDeleteModalOpen(false);
-          setDeletingDocumentType(null);
-          await mutate('https://localhost:7120/api/v1/document-types/pagination');
-        } else {
-          console.error('Failed to delete record');
-        }
-      } catch (error) {
-        console.error('Error deleting record:', error);
-      }
-    }
+  const useDelete = {
+    deletingDocumentType,
+    mutate,
+    setDeletingDocumentType,
+    setIsDeleteModalOpen,
   };
 
-  const handleDeleteModalOpenChange = (open: boolean) => {
-    setIsDeleteModalOpen(open);
-    if (!open) {
-      setDeletingDocumentType(null);
-    }
-  };
+  const { confirmDelete, handleDeleteModalOpenChange } = useDeleteDocumentType(useDelete);
 
   return (
     <Dialog open={isDeleteModalOpen} onOpenChange={handleDeleteModalOpenChange}>
