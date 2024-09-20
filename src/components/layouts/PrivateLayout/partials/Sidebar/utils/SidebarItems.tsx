@@ -7,7 +7,10 @@ export const sidebarItems: SidebarItemProps[] = [
   {
     title: 'Almacenes',
     icon: <Warehouse size={20} />,
-    submenu: [{ title: 'Categorías', icon: <Warehouse size={20} />, href: '/categories' }],
+    submenu: [
+      { title: 'Categorías', icon: <Warehouse size={20} />, href: '/categories' },
+      { title: 'Marcas', icon: <Warehouse size={20} />, href: '/brands' },
+    ],
   },
   {
     title: 'Configuración',
