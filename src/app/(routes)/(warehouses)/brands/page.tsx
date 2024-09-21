@@ -1,4 +1,4 @@
-import { Brands } from '@/app/(routes)/(warehouses)/brands/components/Brands';
+import { Brands } from '@/app/(routes)/(warehouses)/brands/components';
 
 import { CardCustom } from '@/components';
 

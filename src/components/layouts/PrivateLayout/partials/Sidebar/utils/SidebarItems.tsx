@@ -10,6 +10,7 @@ export const sidebarItems: SidebarItemProps[] = [
     submenu: [
       { title: 'Categorías', icon: <Warehouse size={20} />, href: '/categories' },
       { title: 'Marcas', icon: <Warehouse size={20} />, href: '/brands' },
+      { title: 'Unidades de medidas', icon: <Warehouse size={20} />, href: '/measurement-units' },
     ],
   },
   {

@@ -1,20 +1,20 @@
 'use client';
 
-import { Category } from '@/models';
+import { MeasurementUnit } from '@/models';
 import { CheckIcon, PencilIcon, TrashIcon } from 'lucide-react';
 import { mutate } from 'swr';
 
 import { Button, DataGrid } from '@/components';
 
-import { useCategory } from './hooks';
-import { DeleteCategory, FormCategory, RestoreCategory } from './partials';
+import { useMeasurementUnit } from './hooks';
+import { DeleteMeasurementUnit, FormMeasurementUnit, RestoreMeasurementUnit } from './partials';
 
-export const Categories = () => {
+export const MeasurementUnits = () => {
   const {
     error,
-    restoreCategory,
-    editingCategory,
-    deletingCategory,
+    restoreMeasurementUnit,
+    editingMeasurementUnit,
+    deletingMeasurementUnit,
     handleDelete,
     handleActivate,
     isDeleteModalOpen,
@@ -29,31 +29,31 @@ export const Categories = () => {
     data,
     columns,
     pageSize,
-    setEditingCategory,
+    setEditingMeasurementUnit,
     setIsModalOpen,
     setIsDeleteModalOpen,
     setIsRestoreModalOpen,
-    setDeletingCategory,
-    setRestoreCategory,
+    setDeletingMeasurementUnit,
+    setRestoreMeasurementUnit,
     handleSearch,
-  } = useCategory();
+  } = useMeasurementUnit();
 
   if (error) return <div>Failed to load data</div>;
 
   return (
     <div>
       <div className="mb-4 flex items-center justify-between">
-        <FormCategory
+        <FormMeasurementUnit
           isModalOpen={isModalOpen}
           handleModalOpenChange={handleModalOpenChange}
-          editingCategory={editingCategory}
-          setEditingCategory={setEditingCategory}
+          editingMeasurementUnit={editingMeasurementUnit}
+          setEditingMeasurementUnit={setEditingMeasurementUnit}
           form={form}
           mutate={mutate}
           setIsModalOpen={setIsModalOpen}
         />
       </div>
-      <DataGrid<Category>
+      <DataGrid<MeasurementUnit>
         columns={columns}
         data={data?.data || []}
         total={data?.totalPages || 0}
@@ -82,16 +82,16 @@ export const Categories = () => {
           </>
         )}
       />
-      <DeleteCategory
-        deletingCategory={deletingCategory}
-        setDeletingCategory={setDeletingCategory}
+      <DeleteMeasurementUnit
+        deletingMeasurementUnit={deletingMeasurementUnit}
+        setDeletingMeasurementUnit={setDeletingMeasurementUnit}
         mutate={mutate}
         isDeleteModalOpen={isDeleteModalOpen}
         setIsDeleteModalOpen={setIsDeleteModalOpen}
       />
-      <RestoreCategory
-        restoreCategory={restoreCategory}
-        setRestoreCategory={setRestoreCategory}
+      <RestoreMeasurementUnit
+        restoreMeasurementUnit={restoreMeasurementUnit}
+        setRestoreMeasurementUnit={setRestoreMeasurementUnit}
         mutate={mutate}
         isRestoreModalOpen={isRestoreModalOpen}
         setIsRestoreModalOpen={setIsRestoreModalOpen}

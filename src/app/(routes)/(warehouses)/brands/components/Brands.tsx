@@ -1,7 +1,5 @@
 'use client';
 
-'use client';
-
 import { useBrand } from '@/app/(routes)/(warehouses)/brands/components/hooks';
 import { Brand } from '@/models';
 import { CheckIcon, PencilIcon, TrashIcon } from 'lucide-react';
